@@ -300,18 +300,18 @@ p {
   z-index: 2;
 }
 .brand {
-  width: 215px;
-  height: 48px;
+  width: 190px;
+  height: 44px;
   position: relative;
   overflow: hidden;
   padding: 0;
 }
 .brand img {
   position: absolute;
-  width: 236px;
+  width: 210px;
   max-width: none;
-  left: -2px;
-  top: -57px;
+  left: -1px;
+  top: -51px;
   mix-blend-mode: multiply;
 }
 .topbar p,
@@ -834,13 +834,13 @@ textarea {
     padding: 0 20px;
   }
   .brand {
-    width: 168px;
-    height: 38px;
+    width: 150px;
+    height: 34px;
   }
   .brand img {
-    width: 188px;
+    width: 166px;
     left: -1px;
-    top: -45px;
+    top: -40px;
   }
   .topbar p {
     display: none;
