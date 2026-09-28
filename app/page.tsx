@@ -3,15 +3,23 @@ import { useEffect, useState } from "react";
 import {
   ArrowDown,
   ArrowUpRight,
+  BriefcaseBusiness,
   Check,
+  Code2,
+  Facebook,
   Globe2,
+  Instagram,
+  Lightbulb,
   Mail,
   MessageCircle,
   Play,
+  Printer,
   Sparkles,
+  Target,
   X,
 } from "lucide-react";
-import logoVector from "../Media One Logo Vector.jpg";
+import type { LucideIcon } from "lucide-react";
+const logo = "/media-one-digital-dark.png";
 const nav = [
   ["Home", "home"],
   ["Services", "services"],
@@ -21,28 +29,38 @@ const nav = [
   ["Insights", "insights"],
   ["Contact", "contact"],
 ] as const;
-const services = [
+const services: [string, string, string, LucideIcon][] = [
   [
     "01",
     "Brand strategy & identity",
     "Clear positioning, visual identity and a brand people recognise.",
+    Lightbulb,
   ],
   [
     "02",
     "Digital experiences",
     "Websites and apps that make every interaction feel considered.",
+    Code2,
   ],
   [
     "03",
     "Creative campaigns",
     "Ideas, content and campaigns that turn attention into action.",
+    Target,
   ],
   [
     "04",
     "Print & production",
     "Tangible work, delivered beautifully from first proof to final finish.",
+    Printer,
   ],
 ];
+const packages = [
+  ["01", "Starter", "From MWK —", "A focused first step for new and growing businesses.", ["Brand starter session", "Core creative deliverables", "Clear next-step plan"]],
+  ["02", "Growth", "From MWK —", "For businesses ready to build a consistent presence.", ["Strategy + design direction", "Campaign-ready creative", "Ongoing support options"]],
+  ["03", "Pro", "From MWK —", "For teams that need regular, strategic creative support.", ["Priority creative support", "Digital campaign assets", "Reporting and review"]],
+  ["04", "Custom", "Let’s talk", "A tailored partnership built around your goals.", ["Multi-service delivery", "Dedicated project planning", "Made-to-measure scope"]],
+] as const;
 export default function Page() {
   const [active, setActive] = useState("home");
   const [dialog, setDialog] = useState(false);
@@ -61,7 +79,17 @@ export default function Page() {
     document
       .querySelectorAll<HTMLElement>("section[id]")
       .forEach((s) => observer.observe(s));
-    return () => observer.disconnect();
+    const motionObserver = new IntersectionObserver(
+      (entries) => entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.classList.add("is-visible");
+      }),
+      { threshold: 0.12 },
+    );
+    document.querySelectorAll(".reveal").forEach((element) => motionObserver.observe(element));
+    return () => {
+      observer.disconnect();
+      motionObserver.disconnect();
+    };
   }, []);
   function go(id: string) {
     document
@@ -77,9 +105,15 @@ export default function Page() {
           onClick={() => go("home")}
           aria-label="Media One Digital home"
         >
-          <img src={logoVector.src} alt="Media One Digital" />
+          <img src={logo} alt="Media One Digital" />
         </button>
-        <p>INDEPENDENT MINDS. SHARED AMBITION.</p>
+        <nav className="desktop-nav" aria-label="Primary navigation">
+          {nav.map(([label, id]) => (
+            <button key={id} onClick={() => go(id)} aria-current={active === id ? "page" : undefined}>
+              {label}
+            </button>
+          ))}
+        </nav>
         <button className="round-link" onClick={() => setDialog(true)}>
           Get a quote <ArrowUpRight size={16} />
         </button>
@@ -88,11 +122,11 @@ export default function Page() {
         <section className="hero" id="home">
           <div className="hero-grid">
             <div>
-              <p className="eyebrow">MEDIA ONE DIGITAL</p>
+              <p className="eyebrow reveal">CREATIVE + DIGITAL AGENCY / MALAWI</p>
               <h1>
-                We build brands
+                Let&apos;s build
                 <br />
-                that get <i>noticed.</i>
+                what gets <i>noticed.</i>
               </h1>
               <p className="intro">
                 Creative design, digital marketing and digital solutions for
@@ -108,7 +142,7 @@ export default function Page() {
               </div>
             </div>
             <button
-              className={`video-player ${showreelPlaying ? "is-playing" : ""}`}
+              className={`video-player reveal ${showreelPlaying ? "is-playing" : ""}`}
               onClick={() => setShowreelPlaying((playing) => !playing)}
               aria-label={
                 showreelPlaying
@@ -152,13 +186,13 @@ export default function Page() {
         </section>
         <section className="statement" id="about">
           <p className="eyebrow">WHO WE ARE</p>
-          <h2>
+          <h2 className="reveal">
             Big thinking, made <i>real.</i>
           </h2>
           <div className="statement-copy">
             <p>
               We bring strategy, creativity and technology into one focused
-              team—giving ambitious brands everything they need to make a
+              team, giving ambitious brands everything they need to make a
               meaningful mark.
             </p>
             <button className="text-link" onClick={() => go("contact")}>
@@ -196,13 +230,15 @@ export default function Page() {
               touchpoint count.
             </p>
           </div>
-          <div className="service-list">
-            {services.map(([n, t, d]) => (
-              <article key={n}>
+          <div className="service-list service-cards">
+            {services.map(([n, t, d, Icon]) => (
+              <article className="reveal" key={n}>
                 <span>{n}</span>
+                <span className="service-icon"><Icon size={25} strokeWidth={1.5} /></span>
                 <div>
                   <h3>{t}</h3>
                   <p>{d}</p>
+                  <button className="service-more" onClick={() => setDialog(true)}>Learn more <ArrowUpRight size={15} /></button>
                 </div>
                 <ArrowUpRight />
               </article>
@@ -234,7 +270,7 @@ export default function Page() {
             </h3>
             <p>
               From identity systems and company profiles to signs, stationery
-              and corporate gifts—your brand stays consistent everywhere.
+              and corporate gifts, your brand stays consistent everywhere.
             </p>
             <button className="text-link" onClick={() => setDialog(true)}>
               Start my brand <ArrowUpRight size={17} />
@@ -251,7 +287,7 @@ export default function Page() {
             </h2>
           </div>
           <div className="work-grid">
-            <article className="project project-lime">
+            <article className="project project-lime reveal">
               <div>
                 <span>BRAND IDENTITY / 2026</span>
                 <h3>
@@ -260,8 +296,9 @@ export default function Page() {
                 </h3>
               </div>
               <b>01</b>
+              <button aria-label="Ask about brand identity projects" onClick={() => setDialog(true)}><ArrowUpRight /></button>
             </article>
-            <article className="project project-ink">
+            <article className="project project-ink reveal">
               <div>
                 <span>DIGITAL EXPERIENCE / 2026</span>
                 <h3>
@@ -271,8 +308,9 @@ export default function Page() {
                 </h3>
               </div>
               <b>02</b>
+              <button aria-label="Ask about digital experience projects" onClick={() => setDialog(true)}><ArrowUpRight /></button>
             </article>
-            <article className="project project-yellow">
+            <article className="project project-yellow reveal">
               <div>
                 <span>CREATIVE CAMPAIGN / 2026</span>
                 <h3>
@@ -282,6 +320,7 @@ export default function Page() {
                 </h3>
               </div>
               <b>03</b>
+              <button aria-label="Ask about campaign projects" onClick={() => setDialog(true)}><ArrowUpRight /></button>
             </article>
           </div>
           <button className="outline-link" onClick={() => setDialog(true)}>
@@ -327,16 +366,13 @@ export default function Page() {
             are. Go <i>further.</i>
           </h2>
           <div className="package-grid">
-            {[
-              ["Starter", "For individuals and small businesses."],
-              ["Growth", "For businesses building their presence."],
-              ["Pro", "For businesses needing ongoing support."],
-              ["Custom", "For tailored, all-in-one solutions."],
-            ].map(([t, d], i) => (
-              <article key={t}>
-                <span>0{i + 1}</span>
-                <h3>{t}</h3>
-                <p>{d}</p>
+            {packages.map(([number, title, price, description, inclusions]) => (
+              <article className="reveal" key={title}>
+                <span>{number}</span>
+                <p className="package-price">{price}</p>
+                <h3>{title}</h3>
+                <p>{description}</p>
+                <ul>{inclusions.map((item) => <li key={item}>{item}</li>)}</ul>
                 <button onClick={() => setDialog(true)}>
                   Get started <ArrowUpRight size={16} />
                 </button>
@@ -388,6 +424,10 @@ export default function Page() {
             <button className="contact-button" onClick={() => setDialog(true)}>
               Get a quote <ArrowUpRight size={20} />
             </button>
+            <div className="contact-links" aria-label="Contact options">
+              <a href="mailto:hello@mediaone.digital"><Mail size={16} /> Email us</a>
+              <a href="https://wa.me/" target="_blank" rel="noreferrer"><MessageCircle size={16} /> WhatsApp us</a>
+            </div>
             <span>
               <Globe2 size={15} /> ROOTED IN MALAWI. THINKING BEYOND.
             </span>
@@ -413,11 +453,24 @@ export default function Page() {
         </button>
       </nav>
       <footer>
-        <span>© {new Date().getFullYear()} MEDIA ONE DIGITAL</span>
-        <span>BRAND · GROW · CREATE · DELIVER</span>
-        <a href="mailto:hello@mediaone.digital">
-          <Mail size={14} /> HELLO@MEDIAONE.DIGITAL
-        </a>
+        <div className="footer-brand">
+          <img src={logo} alt="Media One Digital" />
+          <p>Creative thinking, digital strategy and work that moves brands forward.</p>
+        </div>
+        <div className="footer-links">
+          <strong>Explore</strong>
+          {nav.map(([label, id]) => <button key={id} onClick={() => go(id)}>{label}</button>)}
+        </div>
+        <div className="footer-links">
+          <strong>Follow us</strong>
+          <a href="#" aria-label="Media One Digital on Instagram"><Instagram size={16} /> Instagram</a>
+          <a href="#" aria-label="Media One Digital on Facebook"><Facebook size={16} /> Facebook</a>
+          <a href="#" aria-label="Media One Digital on LinkedIn"><BriefcaseBusiness size={16} /> LinkedIn</a>
+        </div>
+        <div className="footer-bottom">
+          <span>© {new Date().getFullYear()} MEDIA ONE DIGITAL. ALL RIGHTS RESERVED.</span>
+          <a href="mailto:hello@mediaone.digital"><Mail size={14} /> HELLO@MEDIAONE.DIGITAL</a>
+        </div>
       </footer>
       {dialog && (
         <dialog
