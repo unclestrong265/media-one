@@ -1,41 +1,48 @@
-# Media One Digital — Website & Client Platform
+# Media One Digital
 
-## Project overview
+Agency website built with Next.js, React and TypeScript, with a separate Laravel API foundation.
 
-Based on the **Media One Digital Website Structure** brief, we recommend a mobile-friendly platform that showcases the agency’s work and lets clients request quotes, pay invoices, track projects and approve deliverables in one place.
+## Get started
 
-## Recommended technology stack
+```bash
+npm ci
+npm run dev
+```
 
-| Area | Recommended technology | Purpose |
-| --- | --- | --- |
-| Website & client portal | Next.js, React, TypeScript and Tailwind CSS | A responsive, visually engaging interface, with search-friendly public pages. |
-| Backend | Laravel (PHP) | Central management of quotes, projects, approvals, invoices, payments and client access. |
-| Database | PostgreSQL | Structured records for clients, projects, pricing, payments and rewards. |
-| Staff dashboard & content | Filament for Laravel | A tailored admin area to manage website content and day-to-day client work. |
-| File storage | Private Amazon S3 storage | Store briefs, design versions and final files, with controlled download access. |
-| Background tasks | Laravel queues | Process email notifications, receipts and renewal reminders outside page requests. |
-| Deployment | Managed cloud hosting and managed PostgreSQL | Separate staging and production environments, HTTPS, monitoring and automated backups. |
+Open http://localhost:3000. Run `npm run build` to check TypeScript and generate the production site in `out/`.
 
-**Why this approach:** Next.js supports the presentation and search visibility needs of the public website. Laravel provides the foundation for the business workflows behind it. We recommend one central backend to keep development and ongoing maintenance manageable. See the official [Next.js](https://nextjs.org/docs/app/api-reference/functions/generate-metadata), [Laravel](https://laravel.com/framework/docs/13.x/queues) and [Filament](https://filamentphp.com/docs/5.x/introduction/overview) documentation.
+## Folder map
 
-## Backend scope
+| Folder | Contents |
+| --- | --- |
+| `app/` | Website routes, layout, components, styles and asset helpers |
+| `public/` | Published website images, icons, client logos and 3D team cards |
+| `api/` | Laravel API, database migrations and backend tests |
+| `assets/brand/` | Original brand artwork |
+| `assets/team/` | Original team portraits |
+| `assets/clients/` | Client logo source images |
+| `assets/icons/` | Original icon files |
+| `assets/references/` | Reference imagery |
+| `assets/archives/` | Supplied source archives |
+| `docs/` | Development guide, technology proposal and supplied briefs |
+| `.github/workflows/` | GitHub Pages build and deployment |
 
-- **Quotes:** Service selection, brief uploads and estimates calculated from staff-managed pricing rules; complex requests go to manual quotation.
-- **Client portal:** Project status, versioned files, feedback, revision requests, recorded approvals and final downloads.
-- **Billing:** Deposit and balance invoices, verified payment records, receipts, payment history and hosting/service renewal reminders.
-- **Administration:** Manage services, packages, portfolio projects, team profiles, testimonials, articles and client accounts.
-- **Access protection:** Separate client and staff permissions, private project files and an activity history for key actions.
+Source assets belong in `assets/`; assets used by the website belong in `public/`. Keep framework configuration and package files at the project root. Dependencies, build output and TypeScript caches are generated locally and ignored by Git.
 
-## Payments & support
+## Development and deployment
 
-**PayChangu is the proposed payment gateway** for Malawi mobile money and card payments. Its documented methods include Airtel Money and TNM Mpamba. Merchant eligibility, settlement currencies, fees and automatic recurring billing must be confirmed before implementation. Renewals can initially use invoice payment links. See [supported payment methods](https://support.paychangu.com/hc/articles/24/supported-payment-methods).
+See the [development guide](docs/development.md) for website behavior and local preview instructions. The [technology proposal](docs/technology-proposal.md) describes planned platform features; the [source briefs](docs/briefs/) contain the supplied content.
 
-For 24/7 support, integrate an AI chat service using approved FAQs, with human handover and after-hours enquiry capture. Project-status answers must require authenticated client access.
+The website exports static files. Pushes to `main` run the GitHub Pages workflow with the `/media-one` base path. The Laravel API is a separate application and is not deployed by that workflow.
 
-## Suggested delivery phases
+## Checkout authentication
 
-1. **Website & enquiries:** Public pages, portfolio, packages, insights, content dashboard and quote requests.
-2. **Client operations:** Instant estimates, client portal, file reviews, approvals, invoices and payments.
-3. **Engagement & automation:** Media One Besties rewards, referral credits, AI support and service renewals.
+The project is linked to the **MEDIA ONE** Clerk application (`app_3KMiXlYWNKRyVkggsq2faU8ODHi`). The CLI has pulled development keys into the ignored `.env.local`; Google sign-in and sign-up are enabled in the development instance. To refresh local keys, run `clerk env pull`. For production, configure Google OAuth credentials and the deployed site domain using [Clerk’s Google setup guide](https://clerk.com/docs/guides/configure/auth-strategies/social-connections/google).
 
-**Before scheduling:** Confirm pricing rules, approval workflows, payment account readiness and launch priorities. Development, hosting, storage, email, AI usage and gateway fees should be budgeted separately. Timeline and cost follow the agreed scope.
+For GitHub Pages, add `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` as a repository Actions variable and rebuild. Only the publishable key belongs in this frontend; keep secret keys on the backend.
+
+The branded package checkout requires a Clerk session and uses the account email for payment. It preserves the selected package in the URL across OAuth redirects. Clerk’s React SDK and hash routing support the static export without Next.js middleware. Sign-in and sign-up pages are available at `/sign-in/` and `/sign-up/`, and account controls appear in the navigation. Without a publishable key, the site still builds and checkout displays a contact message.
+
+The CLI’s generated Next.js catch-all routes cannot be exported to GitHub Pages. The app therefore uses Clerk’s React SDK with static auth pages. `docs/clerk-nextjs-server-proxy.ts.example` preserves the Next.js proxy configuration, including the `/__clerk/:path*` matcher, for a future server-hosted migration. It is a reference file and is not executed.
+
+This integration gates the website checkout. The separate Laravel payment API currently remains public; enforcing account access at the API requires server-side verification of Clerk session tokens. Payment confirmation continues to use PayChangu verification.

@@ -1,5 +1,11 @@
+# Dependencies and generated builds
 node_modules/
 .next/
 out/
+*.tsbuildinfo
+
+# Local environment and editor files
 .env*
 !.env.example
+.DS_Store
+Thumbs.db

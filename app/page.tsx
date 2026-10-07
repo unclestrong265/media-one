@@ -3,20 +3,23 @@ import { useEffect, useState } from "react";
 import {
   ArrowDown,
   ArrowUpRight,
-  Check,
   Code2,
   Globe2,
   Lightbulb,
   Play,
   Printer,
-  Sparkles,
   Target,
-  X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { assetPath } from "./asset-path";
-import TeamProfile from "./components/TeamProfile";
+import dynamic from "next/dynamic";
+const TeamProfile = dynamic(() => import("./components/TeamProfile"));
+const QuoteDialog = dynamic(() => import("./components/QuoteDialog"));
 import TeamCarousel from "./components/TeamCarousel";
+import AuthControls from "./components/AuthControls";
+import { clerkPublishableKey } from "./components/CheckoutAuth";
+import { PaymentStatus, type PaidPackage } from "./components/PackageCheckout";
+const PackageCheckout = dynamic(() => import("./components/PackageCheckout"));
 const logo = assetPath("/media-one-logo.png");
 const clientLogos = [
   { image: "rab-processors.jpg", name: "Rab Processors Ltd" },
@@ -104,17 +107,56 @@ const services: [string, string, string, LucideIcon][] = [
   ],
 ];
 const packages = [
-  ["01", "Starter", "Price on request", "A focused first step for new and growing businesses.", ["Brand starter session", "Core creative deliverables", "Clear next-step plan"]],
-  ["02", "Growth", "Price on request", "For businesses ready to build a consistent presence.", ["Strategy + design direction", "Campaign-ready creative", "Ongoing support options"]],
-  ["03", "Pro", "Price on request", "For teams that need regular, strategic creative support.", ["Priority creative support", "Digital campaign assets", "Reporting and review"]],
-  ["04", "Custom", "Let’s talk", "A tailored partnership built around your goals.", ["Multi-service delivery", "Dedicated project planning", "Made-to-measure scope"]],
+  ["01", "Starter", "From K150,000", "Ideal for individuals, startups and small businesses.", [
+    "Logo design", "Basic visual identity", "Business card and letterhead design",
+    "Social profile setup/optimisation", "4 social creatives", "One promotional flyer",
+    "Initial brand consultation",
+  ]],
+  ["02", "Growth", "From K350,000", "Ideal for growing SMEs and organisations building stronger brand and digital presence.", [
+    "Mini brand guidelines", "Business card, letterhead and email signature", "Social strategy",
+    "Monthly content calendar", "12 social creatives", "Copywriting", "Social media management",
+    "Basic advert boosting support", "One promotional campaign concept", "One selected print item",
+    "Monthly report",
+  ]],
+  ["03", "Pro", "From K750,000/month", "Ideal for established businesses needing ongoing creative and digital support.", [
+    "Ongoing graphic design", "Campaign creative", "Corporate communication materials",
+    "Social media management", "Content strategy", "Up to 20 creatives", "Copywriting",
+    "Paid advertising management", "Campaign management", "Basic website support", "Analytics",
+    "Monthly reporting", "Dedicated coordination",
+  ]],
+  ["04", "Custom", "Custom Quote", "Ideal for organisations requiring tailored or integrated solutions.", [
+    "Corporate branding", "Rebranding", "Large-scale printing", "Annual reports", "Digital campaigns",
+    "Website development", "E-commerce", "Mobile applications", "Hosting",
+    "Long-term digital marketing", "Corporate campaigns", "Large corporate gift orders",
+  ]],
 ] as const;
 export default function Page() {
   const [selectedMember, setSelectedMember] = useState<(typeof team)[number] | null>(null);
   const [active, setActive] = useState("home");
   const [dialog, setDialog] = useState(false);
-  const [brief, setBrief] = useState("");
+  const [checkoutPackage, setCheckoutPackage] = useState<PaidPackage | null>(null);
   const [showreelPlaying, setShowreelPlaying] = useState(false);
+  useEffect(() => {
+    const selected = new URLSearchParams(window.location.search).get("checkout");
+    if (selected === "Starter" || selected === "Growth" || selected === "Pro") setCheckoutPackage(selected);
+  }, []);
+
+  function openCheckout(selected: PaidPackage) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("checkout", selected);
+    window.history.replaceState(null, "", url);
+    setCheckoutPackage(selected);
+  }
+
+  function closeCheckout() {
+    const url = new URL(window.location.href);
+    url.searchParams.delete("checkout");
+    url.searchParams.delete("auth");
+    if (url.hash.startsWith("#/")) url.hash = "";
+    window.history.replaceState(null, "", url);
+    setCheckoutPackage(null);
+  }
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -130,7 +172,10 @@ export default function Page() {
       .forEach((s) => observer.observe(s));
     const motionObserver = new IntersectionObserver(
       (entries) => entries.forEach((entry) => {
-        if (entry.isIntersecting) entry.target.classList.add("is-visible");
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          motionObserver.unobserve(entry.target);
+        }
       }),
       { threshold: 0.12 },
     );
@@ -143,7 +188,7 @@ export default function Page() {
   function go(id: string) {
     document
       .getElementById(id)
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      ?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
     history.replaceState(null, "", `#${id}`);
   }
   return (
@@ -163,6 +208,7 @@ export default function Page() {
             </button>
           ))}
         </nav>
+        {clerkPublishableKey && <AuthControls />}
         <button className="round-link" onClick={() => setDialog(true)}>
           Get a quote <ArrowUpRight size={16} />
         </button>
@@ -226,6 +272,8 @@ export default function Page() {
                         alt={set === 0 && index < clientLogos.length ? client.name : ""}
                         width={200}
                         height={120}
+                        loading="lazy"
+                        decoding="async"
                       />
                     </span>
                   ))}
@@ -274,7 +322,7 @@ export default function Page() {
               <article className="team-card" key={member.name}>
                 <button className="team-profile-button" onClick={() => setSelectedMember(member)} aria-label={`Meet ${member.name}`} aria-haspopup="dialog">
                   <div className="team-portrait">
-                    {member.image ? <img src={assetPath(`/team/${member.image}`)} alt={member.name} loading="lazy" /> : <span className="team-initials" aria-hidden="true">CB</span>}
+                    {member.image ? <img src={assetPath(`/team/optimized/${member.image.replace(/\.[^.]+$/, "")}-128.webp`)} srcSet={`${assetPath(`/team/optimized/${member.image.replace(/\.[^.]+$/, "")}-128.webp`)} 128w, ${assetPath(`/team/optimized/${member.image.replace(/\.[^.]+$/, "")}-256.webp`)} 256w`} sizes="116px" width={116} height={116} alt={member.name} loading="lazy" decoding="async" /> : <span className="team-initials" aria-hidden="true">CB</span>}
                   </div>
                   <h3>{member.name}</h3>
                   <p>{member.role}</p>
@@ -432,6 +480,8 @@ export default function Page() {
             <br />
             are. Go <i>further.</i>
           </h2>
+          <p className="package-intro">Four simple packages to match your goals. Prices are starting points; your final quote depends on the agreed scope and production costs.</p>
+          <PaymentStatus />
           <div className="package-grid">
             {packages.map(([number, title, price, description, inclusions]) => (
               <article className="reveal" key={title}>
@@ -440,12 +490,14 @@ export default function Page() {
                 <h3>{title}</h3>
                 <p>{description}</p>
                 <ul>{inclusions.map((item) => <li key={item}>{item}</li>)}</ul>
-                <button onClick={() => setDialog(true)}>
-                  Get started <ArrowUpRight size={16} />
+                <button onClick={() => title === "Custom" ? setDialog(true) : openCheckout(title)}>
+                  {title === "Custom" ? "Request a quote" : "Pay with PayChangu"} <ArrowUpRight size={16} />
                 </button>
               </article>
             ))}
           </div>
+          <p className="package-note">Starting prices are reviewed periodically based on scope, production costs and market conditions. All prices are in Malawi kwacha (MWK).</p>
+          <p className="package-payment">Payment provider: <strong>PayChangu</strong>. Choose Starter, Growth or Pro to pay the starting price securely. Custom packages are quoted individually.</p>
         </section>
         <section className="insights-section" id="insights">
           <div>
@@ -549,44 +601,8 @@ export default function Page() {
         </div>
       </footer>
       {selectedMember && <TeamProfile member={selectedMember} onClose={() => setSelectedMember(null)} />}
-      {dialog && (
-        <dialog
-          open
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setDialog(false);
-          }}
-        >
-          <button
-            className="close-dialog"
-            onClick={() => setDialog(false)}
-            aria-label="Close"
-          >
-            <X />
-          </button>
-          <Sparkles size={30} />
-          <p className="eyebrow">START A CONVERSATION</p>
-          <h3>
-            Tell us what&apos;s
-            <br />
-            on your mind.
-          </h3>
-          <label>
-            Your idea
-            <textarea
-              value={brief}
-              onChange={(e) => setBrief(e.target.value)}
-              placeholder="A little about your project, goals and timing..."
-            />
-          </label>
-          <button
-            className="contact-button"
-            disabled={!brief.trim()}
-            onClick={() => setDialog(false)}
-          >
-            Send enquiry <Check size={18} />
-          </button>
-        </dialog>
-      )}
+      {checkoutPackage && <PackageCheckout packageName={checkoutPackage} onClose={closeCheckout} />}
+      {dialog && <QuoteDialog onClose={() => setDialog(false)} />}
     </>
   );
 }

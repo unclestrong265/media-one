@@ -14,6 +14,13 @@ return [
     |
     */
 
+    'paychangu' => [
+        'secret_key' => env('PAYCHANGU_SECRET_KEY'),
+        'webhook_secret' => env('PAYCHANGU_WEBHOOK_SECRET'),
+        'frontend_url' => env('PAYCHANGU_FRONTEND_URL', 'http://localhost:3000/'),
+        'packages' => ['Starter' => 150000, 'Growth' => 350000, 'Pro' => 750000],
+    ],
+
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],

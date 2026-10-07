@@ -1,3 +1,4 @@
+import { CheckoutAuthProvider } from "./components/CheckoutAuth";
 import type { Metadata } from "next";
 import { Playfair_Display } from "next/font/google";
 import "./globals.css";
@@ -20,8 +21,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={playfairDisplay.variable}>
       <body>
-        {children}
-        <CookieConsent />
+        <CheckoutAuthProvider>
+          {children}
+          <CookieConsent />
+        </CheckoutAuthProvider>
       </body>
     </html>
   );
