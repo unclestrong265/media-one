@@ -1090,15 +1090,17 @@ textarea {
   gap: 72px;
   padding-right: 72px;
 }
-.marquee-group span {
-  min-width: 150px;
-  white-space: nowrap;
+.client-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 200px;
 }
-.trust-strip span {
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: -1px;
-  color: #a0a39b;
+.client-logo img {
+  display: block;
+  width: 200px;
+  height: 120px;
+  object-fit: contain;
 }
 @keyframes logo-marquee {
   to {
@@ -1277,11 +1279,12 @@ textarea {
     gap: 38px;
     padding-right: 38px;
   }
-  .marquee-group span {
-    min-width: 120px;
+  .client-logo {
+    flex-basis: 150px;
   }
-  .trust-strip span {
-    font-size: 13px;
+  .client-logo img {
+    width: 150px;
+    height: 100px;
   }
   .focus-section {
     grid-template-columns: 1fr;

@@ -18,6 +18,11 @@ import { assetPath } from "./asset-path";
 import TeamProfile from "./components/TeamProfile";
 import TeamCarousel from "./components/TeamCarousel";
 const logo = assetPath("/media-one-logo.png");
+const clientLogos = [
+  { image: "rab-processors.jpg", name: "Rab Processors Ltd" },
+  { image: "institute-of-marketing-malawi.png", name: "Institute of Marketing in Malawi" },
+  { image: "ictam.png", name: "ICT Association of Malawi" },
+] as const;
 const whatsappUrl = "https://wa.me/265999893222";
 const team = [
   {
@@ -214,14 +219,15 @@ export default function Page() {
                   key={set}
                   aria-hidden={set === 1}
                 >
-                  {[
-                    "YOUR LOGO",
-                    "YOUR LOGO",
-                    "YOUR LOGO",
-                    "YOUR LOGO",
-                    "YOUR LOGO",
-                  ].map((label, index) => (
-                    <span key={`${set}-${index}`}>{label}</span>
+                  {[...clientLogos, ...clientLogos].map((client, index) => (
+                    <span className="client-logo" key={`${set}-${index}`}>
+                      <img
+                        src={assetPath(`/clients/${client.image}`)}
+                        alt={set === 0 && index < clientLogos.length ? client.name : ""}
+                        width={200}
+                        height={120}
+                      />
+                    </span>
                   ))}
                 </div>
               ))}
