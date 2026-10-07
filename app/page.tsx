@@ -348,14 +348,15 @@ export default function Page() {
           <div className="service-list service-cards">
             {services.map(([n, t, d, Icon]) => (
               <article className="reveal" key={n}>
-                <span>{n}</span>
-                <span className="service-icon"><Icon size={25} strokeWidth={1.5} /></span>
-                <div>
+                <div className="service-card-heading">
+                  <span className="service-number">{n}</span>
+                  <span className="service-icon"><Icon size={25} strokeWidth={1.5} aria-hidden="true" /></span>
+                </div>
+                <div className="service-card-copy">
                   <h3>{t}</h3>
                   <p>{d}</p>
-                  <button className="service-more" onClick={() => setDialog(true)}>Learn more <ArrowUpRight size={15} /></button>
+                  <button className="service-more" onClick={() => setDialog(true)}>Learn more <ArrowUpRight size={15} aria-hidden="true" /></button>
                 </div>
-                <ArrowUpRight />
               </article>
             ))}
           </div>
