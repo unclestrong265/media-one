@@ -3,15 +3,10 @@ import { useEffect, useState } from "react";
 import {
   ArrowDown,
   ArrowUpRight,
-  BriefcaseBusiness,
   Check,
   Code2,
-  Facebook,
   Globe2,
-  Instagram,
   Lightbulb,
-  Mail,
-  MessageCircle,
   Play,
   Printer,
   Sparkles,
@@ -19,7 +14,55 @@ import {
   X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-const logo = "/media-one-digital-dark.png";
+import { assetPath } from "./asset-path";
+import TeamProfile from "./components/TeamProfile";
+import TeamCarousel from "./components/TeamCarousel";
+const logo = assetPath("/media-one-logo.png");
+const whatsappUrl = "https://wa.me/265999893222";
+const team = [
+  {
+    "name": "Shukuru Sean Jazza",
+    "role": "Managing Partner · UX Designer & Developer",
+    "image": "Shukuru.png",
+    "card": "shukuru",
+    "bio": "Shukuru combines technology, creativity and problem-solving to build digital experiences that are both functional and user-focused. As Managing Partner, he contributes to the company’s digital direction while bringing expertise in UX design, development and technology."
+  },
+  {
+    "name": "McLean Mandiza",
+    "role": "Managing Partner · Head of Creative Design",
+    "image": "Mclean.png",
+    "card": "mclean",
+    "bio": "McLean leads the creative vision at Media One Digital. With a strong eye for design and brand communication, he transforms ideas into compelling visual experiences that help businesses communicate clearly, professionally and creatively."
+  },
+  {
+    "name": "Benedict Kamang’ani",
+    "role": "Head of Operations",
+    "image": "Benedict.png",
+    "card": "benedict",
+    "bio": "Benedict keeps the engine running behind the scenes. He oversees operational processes, coordinates internal activities and helps ensure that our team delivers projects efficiently while maintaining the standards our clients expect."
+  },
+  {
+    "name": "Taya Matola",
+    "role": "Project Manager",
+    "image": "Taya.png",
+    "card": "taya",
+    "bio": "Taya brings structure and coordination to every project. She works across teams to keep projects organised, timelines on track and deliverables aligned with client expectations, ensuring ideas move smoothly from concept to completion."
+  },
+  {
+    "name": "Gomezgani Jenda",
+    "role": "Accountant",
+    "image": "Gome.jpeg",
+    "card": "gomezgani",
+    "bio": "Gomezgani supports the financial side of the business, helping maintain sound financial processes and accurate records. His work contributes to the stability, accountability and continued growth of Media One Digital."
+  },
+  {
+    "name": "Chikumbutso Bakuwa",
+    "role": "Human Resource Manager",
+    "image": "Chiku.jpeg",
+    "card": "chikumbutso",
+    "bio": "Chikumbutso focuses on the people behind the work. He supports our team through effective human resource management, employee coordination and people development, helping foster a positive environment where our team can thrive."
+  }
+] as const;
 const nav = [
   ["Home", "home"],
   ["Services", "services"],
@@ -56,12 +99,13 @@ const services: [string, string, string, LucideIcon][] = [
   ],
 ];
 const packages = [
-  ["01", "Starter", "From MWK —", "A focused first step for new and growing businesses.", ["Brand starter session", "Core creative deliverables", "Clear next-step plan"]],
-  ["02", "Growth", "From MWK —", "For businesses ready to build a consistent presence.", ["Strategy + design direction", "Campaign-ready creative", "Ongoing support options"]],
-  ["03", "Pro", "From MWK —", "For teams that need regular, strategic creative support.", ["Priority creative support", "Digital campaign assets", "Reporting and review"]],
+  ["01", "Starter", "Price on request", "A focused first step for new and growing businesses.", ["Brand starter session", "Core creative deliverables", "Clear next-step plan"]],
+  ["02", "Growth", "Price on request", "For businesses ready to build a consistent presence.", ["Strategy + design direction", "Campaign-ready creative", "Ongoing support options"]],
+  ["03", "Pro", "Price on request", "For teams that need regular, strategic creative support.", ["Priority creative support", "Digital campaign assets", "Reporting and review"]],
   ["04", "Custom", "Let’s talk", "A tailored partnership built around your goals.", ["Multi-service delivery", "Dedicated project planning", "Made-to-measure scope"]],
 ] as const;
 export default function Page() {
+  const [selectedMember, setSelectedMember] = useState<(typeof team)[number] | null>(null);
   const [active, setActive] = useState("home");
   const [dialog, setDialog] = useState(false);
   const [brief, setBrief] = useState("");
@@ -72,7 +116,7 @@ export default function Page() {
         const v = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (v) setActive(v.target.id);
+        if (v) setActive(v.target.id === "team" ? "about" : v.target.id);
       },
       { rootMargin: "-35% 0px -45% 0px", threshold: [0.05, 0.3, 0.6] },
     );
@@ -155,7 +199,7 @@ export default function Page() {
                 <Play size={28} fill="currentColor" />
               </span>
               <span className="video-status">
-                {showreelPlaying ? "PLAYING — 00:12" : "PLAY SHOWREEL — 01:02"}
+                {showreelPlaying ? "PLAYING · 00:12" : "PLAY SHOWREEL · 01:02"}
               </span>
             </button>
           </div>
@@ -195,7 +239,7 @@ export default function Page() {
               team, giving ambitious brands everything they need to make a
               meaningful mark.
             </p>
-            <button className="text-link" onClick={() => go("contact")}>
+            <button className="text-link" onClick={() => go("team")}>
               Get to know us <ArrowUpRight size={18} />
             </button>
           </div>
@@ -216,6 +260,23 @@ export default function Page() {
               <b>05</b> Local + global
             </span>
           </div>
+        </section>
+        <section className="team-section" id="team" aria-labelledby="team-heading">
+          <h2 id="team-heading" className="eyebrow team-heading">OUR TEAM</h2>
+          <TeamCarousel>
+            {team.map((member) => (
+              <article className="team-card" key={member.name}>
+                <button className="team-profile-button" onClick={() => setSelectedMember(member)} aria-label={`Meet ${member.name}`} aria-haspopup="dialog">
+                  <div className="team-portrait">
+                    {member.image ? <img src={assetPath(`/team/${member.image}`)} alt={member.name} loading="lazy" /> : <span className="team-initials" aria-hidden="true">CB</span>}
+                  </div>
+                  <h3>{member.name}</h3>
+                  <p>{member.role}</p>
+                  <span className="team-view-profile">View profile <ArrowUpRight size={14} /></span>
+                </button>
+              </article>
+            ))}
+          </TeamCarousel>
         </section>
         <section className="services-section" id="services">
           <div className="section-intro">
@@ -419,14 +480,21 @@ export default function Page() {
           <div className="contact-side">
             <p>
               From branding and digital marketing to printing, websites and
-              apps—we bring your ideas to life.
+              apps, we bring your ideas to life.
             </p>
             <button className="contact-button" onClick={() => setDialog(true)}>
               Get a quote <ArrowUpRight size={20} />
             </button>
             <div className="contact-links" aria-label="Contact options">
-              <a href="mailto:hello@mediaone.digital"><Mail size={16} /> Email us</a>
-              <a href="https://wa.me/" target="_blank" rel="noreferrer"><MessageCircle size={16} /> WhatsApp us</a>
+              <a href="mailto:mediaone265@gmail.com"><img src={assetPath("/icons/email.svg")} width={16} height={16} alt="" /> <span>mediaone265@gmail.com</span></a>
+              <div className="contact-phone-numbers">
+                <img src={assetPath("/icons/phone.svg")} width={16} height={16} alt="" />
+                <a href="tel:+265888122555">+265 888 122 555</a>
+                <span aria-hidden="true">/</span>
+                <a href="tel:+265888693105">+265 888 693 105</a>
+              </div>
+              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer"><img src={assetPath("/icons/whatsapp.svg")} width={20} height={20} alt="" /> WhatsApp: +265 999 893 222</a>
+              <a href="https://www.google.com/maps/search/?api=1&query=Kanjedza%2C%20Blantyre%2C%20Malawi" target="_blank" rel="noreferrer"><img src={assetPath("/icons/location.svg")} width={16} height={16} alt="" /> Kanjedza, Blantyre, Malawi</a>
             </div>
             <span>
               <Globe2 size={15} /> ROOTED IN MALAWI. THINKING BEYOND.
@@ -444,13 +512,15 @@ export default function Page() {
             {l}
           </button>
         ))}
-        <button
+        <a
           className="nav-contact"
-          onClick={() => setDialog(true)}
-          aria-label="Open contact form"
+          href={whatsappUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Chat with Media One Digital on WhatsApp"
         >
-          <MessageCircle size={18} />
-        </button>
+          <img src={assetPath("/icons/whatsapp.svg")} width={24} height={24} alt="" />
+        </a>
       </nav>
       <footer>
         <div className="footer-brand">
@@ -463,15 +533,16 @@ export default function Page() {
         </div>
         <div className="footer-links">
           <strong>Follow us</strong>
-          <a href="#" aria-label="Media One Digital on Instagram"><Instagram size={16} /> Instagram</a>
-          <a href="#" aria-label="Media One Digital on Facebook"><Facebook size={16} /> Facebook</a>
-          <a href="#" aria-label="Media One Digital on LinkedIn"><BriefcaseBusiness size={16} /> LinkedIn</a>
+          <a href="https://www.instagram.com/mediaonemw/" target="_blank" rel="noreferrer" aria-label="Media One Digital on Instagram"><img src={assetPath("/icons/instagram.svg")} width={16} height={16} alt="" /> Instagram</a>
+          <a href="https://web.facebook.com/mediaonemw/" target="_blank" rel="noreferrer" aria-label="Media One Digital on Facebook"><img src={assetPath("/icons/facebook.svg")} width={16} height={16} alt="" /> Facebook</a>
+          <a href="https://www.behance.net/mediaonemw" target="_blank" rel="noreferrer" aria-label="Media One Digital on Behance"><Globe2 size={16} /> Behance</a>
         </div>
         <div className="footer-bottom">
           <span>© {new Date().getFullYear()} MEDIA ONE DIGITAL. ALL RIGHTS RESERVED.</span>
-          <a href="mailto:hello@mediaone.digital"><Mail size={14} /> HELLO@MEDIAONE.DIGITAL</a>
+          <a href="mailto:mediaone265@gmail.com"><img src={assetPath("/icons/email.svg")} width={14} height={14} alt="" /> <span>MEDIAONE265@GMAIL.COM</span></a>
         </div>
       </footer>
+      {selectedMember && <TeamProfile member={selectedMember} onClose={() => setSelectedMember(null)} />}
       {dialog && (
         <dialog
           open

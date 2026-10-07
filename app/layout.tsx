@@ -10,7 +10,7 @@ const playfairDisplay = Playfair_Display({
   display: "swap",
 });
 export const metadata: Metadata = {
-  title: "Media One Digital — Creative. Digital. Delivered.",
+  title: "Media One Digital | Creative. Digital. Delivered.",
   description:
     "Branding, creative design, digital marketing and technology. Built in Malawi, made for possibility.",
 };
